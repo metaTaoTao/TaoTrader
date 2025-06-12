@@ -111,7 +111,7 @@ def plot_kline_chart(
     )
 
 
-def plot_executed_trades(df: pd.DataFrame, title="Backtest Result with Executed Trades"):
+def plot_backtest_results(df: pd.DataFrame, title="Backtest Result with Executed Trades"):
     """
     Plot backtest result focusing on actual executed entry/exit signals.
 
