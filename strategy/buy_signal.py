@@ -7,7 +7,7 @@ class BuySignal:
 
     def detect_pullback_entry(self, df):
         """
-        Detect potential entry signals based on:
+        Detect potential entry strategy based on:
         - Prior uptrend
         - 2–3 wave pullback (higher low or double bottom)
         - Bullish reversal candle

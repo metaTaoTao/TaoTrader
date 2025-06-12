@@ -1,0 +1,31 @@
+{
+  // Initial capital in USD
+  "initial_capital": 5000,
+
+  // Percentage of capital to use per trade (e.g. 0.1 = 10%)
+  "position_size_pct": 0.1,
+
+  // Slippage rate applied to buy/sell prices (e.g. 0.001 = 0.1%)
+  "slippage": 0.001,
+
+  // Max allowable drawdown from peak before triggering risk action
+  "max_drawdown_pct": 0.2,
+
+  // Minimum score (0 to 1) required by the scoring system to open a position
+  "min_entry_score": 0.75,
+
+  // Maximum number of open positions at the same time
+  "max_positions": 3,
+
+  // Risk control settings
+  "risk_control": {
+    // Maximum dollar loss allowed per trade
+    "max_loss_per_trade": 100,
+
+    // Maximum cumulative dollar loss allowed per day
+    "max_daily_loss": 500,
+
+    // Maximum number of consecutive losing trades allowed
+    "max_consecutive_losses": 3
+  }
+}

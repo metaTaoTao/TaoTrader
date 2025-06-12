@@ -14,7 +14,7 @@ def plot_kline_chart(
     fig_ratio=(20, 10)
 ):
     """
-    Plot candlestick chart with optional EMA lines, volume, entry/exit signals, and detailed exit types.
+    Plot candlestick chart with optional EMA lines, volume, entry/exit strategy, and detailed exit types.
 
     Parameters:
     ----------
@@ -53,7 +53,7 @@ def plot_kline_chart(
             color = {5: 'green', 10: 'blue', 20: 'orange', 60: 'red'}.get(span, 'gray')
             addplots.append(mpf.make_addplot(df_plot[label], color=color, width=1))
 
-    # Entry signals marker
+    # Entry strategy marker
     if show_entry_signal and 'entry_signal' in df_plot.columns:
         buy_mask = df_plot["entry_signal"] == True
         buy_price = df_plot["low"] * 0.995
@@ -65,7 +65,7 @@ def plot_kline_chart(
             color='lime'
         ))
 
-    # Combined exit signals marker
+    # Combined exit strategy marker
     if show_exit_signal and 'exit_signal' in df_plot.columns:
         sell_mask = df_plot["exit_signal"] == True
         sell_price = df_plot["high"] * 1.005
@@ -77,7 +77,7 @@ def plot_kline_chart(
             color='red'
         ))
 
-    # Individual exit signals types
+    # Individual exit strategy types
     if show_exit_types:
         for col, color in [
             ("exit_signal_1", 'purple'),
