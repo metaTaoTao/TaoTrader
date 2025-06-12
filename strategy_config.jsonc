@@ -1,6 +1,7 @@
 {
-  // Initial capital in USD
-  "initial_capital": 5000,
+  "starting_capital": 5000,              // Initial trading capital
+  "stop_loss_pct": 0.03,                 // Stop loss percentage from entry
+  "risk_reward_ratio": 2.0,               // Take profit multiplier based on stop loss
 
   // Percentage of capital to use per trade (e.g. 0.1 = 10%)
   "position_size_pct": 0.1,

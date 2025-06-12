@@ -1,4 +1,5 @@
 import mplfinance as mpf
+import matplotlib.pyplot as plt
 import pandas as pd
 
 def plot_kline_chart(
@@ -109,3 +110,43 @@ def plot_kline_chart(
         tight_layout=True
     )
 
+
+def plot_executed_trades(df: pd.DataFrame, title="Backtest Result with Executed Trades"):
+    """
+    Plot backtest result focusing on actual executed entry/exit signals.
+
+    Parameters:
+    - df (pd.DataFrame): Must contain ['timestamp', 'close', 'executed_entry', 'executed_exit', 'capital', 'realized_pnl', 'unrealized_pnl']
+    - title (str): Title of the plot
+    """
+    df = df.copy()
+    df.set_index("timestamp", inplace=True)
+
+    fig, axes = plt.subplots(3, 1, figsize=(16, 12), sharex=True)
+
+    # --- Price chart with actual trades ---
+    axes[0].plot(df["close"], label="Close Price", color="black")
+    axes[0].scatter(df[df["executed_entry"]].index, df[df["executed_entry"]]["close"],
+                    marker="^", color="lime", label="Buy Executed", s=100)
+    axes[0].scatter(df[df["executed_exit"]].index, df[df["executed_exit"]]["close"],
+                    marker="v", color="red", label="Sell Executed", s=100)
+    axes[0].set_ylabel("Price")
+    axes[0].set_title(f"{title} - Price & Trades")
+    axes[0].legend()
+
+    # --- Capital curve ---
+    axes[1].plot(df["capital"], label="Capital", color="blue")
+    axes[1].set_ylabel("Capital ($)")
+    axes[1].set_title("Capital Over Time")
+    axes[1].legend()
+
+    # --- PnL curve ---
+    axes[2].plot(df["realized_pnl"], label="Realized PnL", color="green")
+    axes[2].plot(df["unrealized_pnl"], label="Unrealized PnL", color="orange", linestyle="--")
+    axes[2].set_ylabel("PnL ($)")
+    axes[2].set_title("PnL Over Time")
+    axes[2].legend()
+
+    plt.xlabel("Time")
+    plt.tight_layout()
+    plt.show()
