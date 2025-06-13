@@ -1,5 +1,9 @@
 import pandas as pd
 import okx.MarketData as MarketData
+import time
+from datetime import datetime
+from dateutil import tz
+
 
 class OKXDataFetcher:
     """
@@ -16,15 +20,6 @@ class OKXDataFetcher:
         self.marketDataAPI = MarketData.MarketAPI(flag=flag)
 
     def list_of_dicts_to_df(self, data):
-        """
-        Convert a list of dictionaries to a pandas DataFrame.
-
-        Parameters:
-        - data (list): List of dictionaries from OKX API
-
-        Returns:
-        - pd.DataFrame: Formatted DataFrame with numeric types and timestamp conversion
-        """
         if not isinstance(data, list) or len(data) == 0:
             print("Input data is not a non-empty list.")
             return pd.DataFrame()
@@ -45,15 +40,6 @@ class OKXDataFetcher:
         return df
 
     def parse_okx_kline(self, data):
-        """
-        Parse K-line (candlestick) data returned by OKX.
-
-        Parameters:
-        - data (list): List of lists containing OHLCV + meta fields
-
-        Returns:
-        - pd.DataFrame: Cleaned K-line dataframe
-        """
         if not data:
             return pd.DataFrame()
 
@@ -61,7 +47,6 @@ class OKXDataFetcher:
             "timestamp", "open", "high", "low", "close",
             "volume", "turnover", "confirm", "status"
         ])
-
         df["timestamp"] = pd.to_datetime(df["timestamp"].astype("int64"), unit="ms")
         df[["open", "high", "low", "close", "volume"]] = df[["open", "high", "low", "close", "volume"]].astype(float)
         df = df[["timestamp", "open", "high", "low", "close", "volume"]]
@@ -70,44 +55,47 @@ class OKXDataFetcher:
         return df
 
     def get_hist_kline(self, instId, bar='1m'):
-        """
-        Fetch historical candlestick data from OKX.
-
-        Parameters:
-        - instId (str): Instrument ID (e.g. BTC-USDT-SWAP)
-        - bar (str): Interval of K-line (e.g. '1m', '5m', '4h')
-
-        Returns:
-        - pd.DataFrame: K-line historical data
-        """
         result = self.marketDataAPI.get_history_candlesticks(instId=instId, bar=bar)
         return self.parse_okx_kline(result["data"])
 
-    def get_kline(self, instId, bar='1m', limit=300):
+    def get_kline(self, instId, bar='1m', total=300):
         """
-        Fetch recent K-line data.
+        Fetch recent K-line data, supports pagination beyond 300.
 
         Parameters:
         - instId (str): Instrument ID
-        - bar (str): Time interval
-        - limit (int): Number of records to retrieve
+        - bar (str): Time interval (e.g., '1m', '5m', '1H')
+        - total (int): Total number of candles to fetch
 
         Returns:
-        - pd.DataFrame: Recent K-line data
+        - pd.DataFrame: Combined K-line data
         """
-        result = self.marketDataAPI.get_candlesticks(instId=instId, bar=bar, limit=limit)
-        return self.parse_okx_kline(result["data"])
+        all_data = []
+        next_end = None
+        fetched = 0
+        max_batch = 300
+
+        while fetched < total:
+            limit = min(max_batch, total - fetched)
+            params = {"instId": instId, "bar": bar, "limit": limit}
+            if next_end:
+                params["after"] = next_end
+
+            result = self.marketDataAPI.get_candlesticks(**params)
+            batch = result.get("data", [])
+
+            if not batch:
+                break
+
+            all_data += batch
+            fetched += len(batch)
+
+            next_end = batch[-1][0]  # 最后一条的 timestamp
+            time.sleep(0.2)  # 防止频率限制
+
+        return self.parse_okx_kline(all_data)
 
     def get_all_tickers(self, instType="SWAP"):
-        """
-        Get all tickers of a certain instrument type and estimate 24H USD volume.
-
-        Parameters:
-        - instType (str): Instrument type, e.g. 'SPOT', 'SWAP', 'FUTURES'
-
-        Returns:
-        - pd.DataFrame: Sorted by 24h USD volume
-        """
         result = self.marketDataAPI.get_tickers(instType=instType)
         data = result["data"]
         df = self.list_of_dicts_to_df(data)

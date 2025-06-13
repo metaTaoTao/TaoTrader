@@ -55,3 +55,4 @@ def generate_markdown_report(trades_df: pd.DataFrame, perf: dict, unrealized: di
         f.write(f"Report generated at {datetime.now()}\n")
 
     logger.info(f"Markdown report saved to: {filepath}")
+    return filepath  # 返回路径
