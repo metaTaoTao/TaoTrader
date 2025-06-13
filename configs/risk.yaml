@@ -1,0 +1,8 @@
+# Risk Control Parameters
+
+max_single_trade_loss_pct: 0.02   # Max loss per trade (2%)
+max_daily_loss_pct: 0.05          # Max daily loss (5%)
+max_total_drawdown_pct: 0.15      # Max total drawdown (15%)
+
+position_size_mode: 'score_based' # score_based / fixed
+fixed_position_pct: 0.05          # Only used if fixed

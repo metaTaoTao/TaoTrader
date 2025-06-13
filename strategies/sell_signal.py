@@ -1,4 +1,5 @@
 import pandas as pd
+import mplfinance as mpf
 
 class SellSignal:
     def __init__(self):
@@ -12,7 +13,7 @@ class SellSignal:
             volume_spike_multiplier=2
     ):
         """
-        Detect three types of exit strategy in a price time series DataFrame.
+        Detect three types of exit signals in a price time series DataFrame.
 
         Parameters:
         ----------
@@ -21,7 +22,7 @@ class SellSignal:
             ['timestamp', 'open', 'high', 'low', 'close', 'volume']
 
         volume_window : int, default=20
-            The lookback window for calculating the average volume (used for strategy 1 and 2 comparisons)
+            The lookback window for calculating the average volume (used for signal 1 and 2 comparisons)
 
         price_jump_threshold : float, default=0.03
             The minimum open-to-close percentage increase to qualify as a sharp price spike (e.g., 0.03 means 3%)
@@ -74,8 +75,10 @@ class SellSignal:
                 if highs[i] > highs[i - 1] > highs[i - 2] and volumes[i] < volumes[i - 1] < volumes[i - 2]:
                     df.loc[df.index[i], "exit_signal_3"] = True
 
-            # Combine any strategy
+            # Combine any signal
             if df.loc[df.index[i], ["exit_signal_1", "exit_signal_2", "exit_signal_3"]].any():
                 df.loc[df.index[i], "exit_signal"] = True
 
         return df
+
+

@@ -16,4 +16,4 @@ def print_tree(root, indent=""):
 
 if __name__ == "__main__":
     print("Project structure:\n")
-    print_tree("D:\Projects\PythonProjects\TaoTrader")
+    print_tree(r"C:\Users\tzhang\PycharmProjects\TaoTrader")

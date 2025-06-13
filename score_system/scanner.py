@@ -1,11 +1,10 @@
-from data.market_data import OKXDataFetcher
+from data.market_data import get_kline, get_all_tickers
 from time import sleep
 import pandas as pd
 
-
 class Scanner:
     def __init__(self):
-        self.okx_data_fetcher = OKXDataFetcher()
+        pass
 
     def compute_trend_score(self, df):
         """
@@ -51,8 +50,9 @@ class Scanner:
             "ema_structure": ema_structure
         }
 
+
     def scan_strong_symbols(self, volume_threshold=1.0, kline_limit=30, max_symbols=50):
-        ticker_df = self.okx_data_fetcher.get_all_tickers()
+        ticker_df = get_all_tickers()
         filtered_df = ticker_df[ticker_df["volume_usd_million"] > volume_threshold]
 
         if len(filtered_df) > max_symbols:
@@ -63,7 +63,7 @@ class Scanner:
 
         for symbol in top_symbols:
             try:
-                df = self.okx_data_fetcher.get_kline(symbol, bar="1H", limit=kline_limit)
+                df = get_kline(symbol, bar="1H", limit=kline_limit)
                 if len(df) < 10:
                     continue
                 score_data = self.compute_trend_score(df)
@@ -82,8 +82,7 @@ class Scanner:
         df_result = pd.DataFrame(results).sort_values(by="score", ascending=False)
         return df_result
 
-
 if __name__ == "__main__":
-    s = Scanner()
+    s=Scanner()
     res = s.scan_strong_symbols()
     print(res)

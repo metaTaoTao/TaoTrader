@@ -5,7 +5,7 @@ class StopLossStrategy:
     - structure: based on predefined support levels
 
     Parameters:
-    - config: Dictionary containing strategy parameters
+    - config: Dictionary containing strategies parameters
     """
     def __init__(self, config):
         self.method = config.get("stop_loss_method", "atr")

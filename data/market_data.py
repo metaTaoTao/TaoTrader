@@ -66,6 +66,7 @@ class OKXDataFetcher:
         df[["open", "high", "low", "close", "volume"]] = df[["open", "high", "low", "close", "volume"]].astype(float)
         df = df[["timestamp", "open", "high", "low", "close", "volume"]]
         df = df.sort_values("timestamp").reset_index(drop=True)
+        df = df.set_index("timestamp")
         return df
 
     def get_hist_kline(self, instId, bar='1m'):

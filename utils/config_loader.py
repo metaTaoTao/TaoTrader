@@ -1,10 +1,21 @@
-# utils/config_loader.py
 import os
-import json5
+import yaml
 
-def load_strategy_config(filename="strategy_config.jsonc"):
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    config_path = os.path.join(base_dir, filename)
+class ConfigLoader:
+    """
+    A simple YAML config loader for strategy, backtest, and risk control configs.
+    """
 
-    with open(config_path, 'r') as f:
-        return json5.load(f)
+    @staticmethod
+    def load(path: str) -> dict:
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 项目根目录
+        abs_path = os.path.join(base_path, path)
+
+        if not os.path.exists(abs_path):
+            raise FileNotFoundError(f"Config file not found: {abs_path}")
+
+        try:
+            with open(abs_path, 'r') as file:
+                return yaml.safe_load(file)
+        except yaml.YAMLError as e:
+            raise ValueError(f"YAML parsing error: {e}")

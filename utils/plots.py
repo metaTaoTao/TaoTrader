@@ -2,20 +2,21 @@ import mplfinance as mpf
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
 def plot_kline_chart(
-    df,
-    title='Candlestick Chart',
-    show_ema=True,
-    show_volume=True,
-    show_entry_signal=True,
-    show_exit_signal=True,
-    show_exit_types=True,
-    ema_spans=[5, 10, 20, 60],
-    fig_scale=1.5,
-    fig_ratio=(20, 10)
+        df,
+        title='Candlestick Chart',
+        show_ema=True,
+        show_volume=True,
+        show_entry_signal=True,
+        show_exit_signal=True,
+        show_exit_types=True,
+        ema_spans=[5, 10, 20, 60],
+        fig_scale=1.5,
+        fig_ratio=(20, 10)
 ):
     """
-    Plot candlestick chart with optional EMA lines, volume, entry/exit strategy, and detailed exit types.
+    Plot candlestick chart with optional EMA lines, volume, entry/exit strategies, and detailed exit types.
 
     Parameters:
     ----------
@@ -54,7 +55,7 @@ def plot_kline_chart(
             color = {5: 'green', 10: 'blue', 20: 'orange', 60: 'red'}.get(span, 'gray')
             addplots.append(mpf.make_addplot(df_plot[label], color=color, width=1))
 
-    # Entry strategy marker
+    # Entry strategies marker
     if show_entry_signal and 'entry_signal' in df_plot.columns:
         buy_mask = df_plot["entry_signal"] == True
         buy_price = df_plot["low"] * 0.995
@@ -66,7 +67,7 @@ def plot_kline_chart(
             color='lime'
         ))
 
-    # Combined exit strategy marker
+    # Combined exit strategies marker
     if show_exit_signal and 'exit_signal' in df_plot.columns:
         sell_mask = df_plot["exit_signal"] == True
         sell_price = df_plot["high"] * 1.005
@@ -78,7 +79,7 @@ def plot_kline_chart(
             color='red'
         ))
 
-    # Individual exit strategy types
+    # Individual exit strategies types
     if show_exit_types:
         for col, color in [
             ("exit_signal_1", 'purple'),
@@ -148,5 +149,44 @@ def plot_backtest_results(df: pd.DataFrame, title="Backtest Result with Executed
     axes[2].legend()
 
     plt.xlabel("Time")
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_pnl_curve(df):
+    if df.empty:
+        print("No trades to plot.")
+        return
+    df['cum_return'] = (1 + df['pnl_pct']).cumprod()
+    plt.figure(figsize=(10, 5))
+    plt.plot(df['exit_time'], df['cum_return'], label='Equity Curve')
+    plt.title("Cumulative Return")
+    plt.xlabel("Time")
+    plt.ylabel("Return")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_signals_on_price(price_df, trade_df):
+    if price_df.empty or trade_df.empty:
+        return
+
+    plt.figure(figsize=(12, 5))
+    plt.plot(price_df.index, price_df['close'], label='Price')
+
+    long_entries = trade_df[trade_df['direction'] == 'long']
+    short_entries = trade_df[trade_df['direction'] == 'short']
+
+    plt.scatter(long_entries['entry_time'], long_entries['entry_price'], marker='^', color='green', label='Long Entry')
+    plt.scatter(short_entries['entry_time'], short_entries['entry_price'], marker='v', color='red', label='Short Entry')
+    plt.scatter(trade_df['exit_time'], trade_df['exit_price'], marker='x', color='black', label='Exit')
+
+    plt.title("Trade Signals on Price")
+    plt.xlabel("Time")
+    plt.ylabel("Price")
+    plt.legend()
+    plt.grid(True)
     plt.tight_layout()
     plt.show()

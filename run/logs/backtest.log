@@ -1,0 +1,19 @@
+[2025-06-12 19:56:08] INFO - Starting backtest run...
+[2025-06-12 19:56:09] INFO - HTTP Request: GET https://www.okx.com/api/v5/market/candles?instId=BTC-USDT-SWAP&bar=1H&limit=300 "HTTP/2 200 OK"
+[2025-06-12 19:56:09] INFO - Fetched 300 rows of K-line data.
+[2025-06-12 19:56:09] INFO - Loaded backtest context with strategy, backtest, and risk config.
+[2025-06-12 19:56:09] INFO - Loaded strategy class: MovingAverageCrossoverStrategy
+[2025-06-12 19:56:09] INFO - Initialized trade logger and risk checker.
+[2025-06-12 19:56:09] INFO - Backtest engine initialized. Starting engine run...
+[2025-06-12 19:56:09] INFO - Starting backtest engine run...
+[2025-06-12 19:56:09] INFO - [Signal] Strong crossover at index 28 → long_strong
+[2025-06-12 19:56:09] INFO - Opening new position at index 28 with signal long_strong
+[2025-06-12 19:56:09] INFO - [Stop Loss] Triggered at price 100434.90 (entry=104973.40)
+[2025-06-12 19:56:09] INFO - Stop loss triggered at index 128
+[2025-06-12 19:56:09] INFO - [Signal] Medium crossover at index 139 → long_medium
+[2025-06-12 19:56:09] INFO - Opening new position at index 139 with signal long_medium
+[2025-06-12 19:56:09] INFO - [Unrealized] Holding position at end → {'entry_time': Timestamp('2025-06-06 07:00:00'), 'entry_price': np.float64(103102.1), 'current_price': np.float64(105820.0), 'qty': np.float64(0.4635147368729146), 'capital': np.float64(47789.34275254493), 'direction': 'long', 'pnl_dollar': np.float64(1211.3674672426737), 'pnl_pct': np.float64(0.0253480671101752)}
+[2025-06-12 19:56:09] INFO - Backtest engine run completed.
+[2025-06-12 19:56:09] INFO - Performance analysis complete.
+[2025-06-12 19:56:09] INFO - ==== Performance Summary ====
+[2025-06-12 19:56:09] INFO - {'Total Trades': 1, 'Total PnL ($)': np.float64(-3209.95), 'Average PnL ($)': np.float64(-3209.95), 'Unrealized Position': {'entry_time': Timestamp('2025-06-06 07:00:00'), 'entry_price': np.float64(103102.1), 'current_price': np.float64(105820.0), 'qty': np.float64(0.4635147368729146), 'capital': np.float64(47789.34275254493), 'direction': 'long', 'pnl_dollar': np.float64(1211.3674672426737), 'pnl_pct': np.float64(0.0253480671101752)}}

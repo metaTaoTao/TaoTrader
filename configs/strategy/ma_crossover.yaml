@@ -1,0 +1,9 @@
+# Moving Average Crossover Strategy Config
+
+short_window: 5         # Short-term moving average period
+long_window: 20         # Long-term moving average period
+
+volume_multiplier: 1.5  # Volume threshold multiplier for strong buy
+
+stop_loss_pct: 0.03     # Stop loss threshold (5%)
+take_profit_pct: 0.08   # Take profit threshold (10%)

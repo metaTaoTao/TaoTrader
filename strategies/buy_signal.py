@@ -7,7 +7,7 @@ class BuySignal:
 
     def detect_pullback_entry(self, df):
         """
-        Detect potential entry strategy based on:
+        Detect potential entry signals based on:
         - Prior uptrend
         - 2–3 wave pullback (higher low or double bottom)
         - Bullish reversal candle
@@ -91,3 +91,9 @@ class BuySignal:
 
         return df
 
+
+if __name__ == "__main__":
+    from data.market_data import get_kline
+    df = get_kline('RESOLV-USDT-SWAP', '5m')
+    bs = BuySignal()
+    res = bs.detect_pullback_entry(df)
