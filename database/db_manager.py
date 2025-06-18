@@ -1,11 +1,15 @@
 import sqlite3
 import pandas as pd
+import os
 from typing import Optional
 from datetime import datetime
 
 
 class DBManager:
-    def __init__(self, db_path: str = "taotrader.db"):
+    def __init__(self, db_path: str = None):
+        if db_path is None:
+            # 自动定位到 database 文件夹里的数据库
+            db_path = os.path.join(os.path.dirname(__file__), "taotrader.db")
         self.conn = sqlite3.connect(db_path)
         self.cursor = self.conn.cursor()
 
@@ -16,6 +20,10 @@ class DBManager:
             columns = [desc[0] for desc in self.cursor.description]
             return dict(zip(columns, row))
         return None
+
+    def get_all_categories(self) -> pd.DataFrame:
+        query = "SELECT symbol, category FROM categories"
+        return pd.read_sql_query(query, self.conn)
 
     def insert_ticker(self, symbol, base_asset, quote_asset, coingecko_id, category=None, logo_url=None):
         now = datetime.utcnow().isoformat()
