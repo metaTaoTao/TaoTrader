@@ -1,88 +1,68 @@
-from data.market_data import get_kline, get_all_tickers
-from time import sleep
+from utils.file_helper import DataIO
+from data.market_data import OKXDataFetcher, BinanceDataFetcher
+from factors.scorer import EnhancedStrengthScorer
+from tqdm import tqdm
 import pandas as pd
-
-class Scanner:
-    def __init__(self):
-        pass
-
-    def compute_trend_score(self, df):
-        """
-        Calculate trend score: EMA structure + return + volume change
-        """
-        df = df.copy()
-        # Calculate exponential moving averages
-        df["EMA5"] = df["close"].ewm(span=5).mean()
-        df["EMA10"] = df["close"].ewm(span=10).mean()
-        df["EMA20"] = df["close"].ewm(span=20).mean()
-        df["EMA60"] = df["close"].ewm(span=60).mean()
-
-        ema5 = df["EMA5"].iloc[-1]
-        ema10 = df["EMA10"].iloc[-1]
-        ema20 = df["EMA20"].iloc[-1]
-        ema60 = df["EMA60"].iloc[-1]
-
-        # Determine trend structure based on EMA alignment
-        if ema5 > ema10 > ema20 > ema60:
-            ema_structure = "bullish"
-            ema_score = 40
-        elif ema5 < ema10 < ema20 < ema60:
-            ema_structure = "bearish"
-            ema_score = 20  # Optionally give bearish trend some score
-        else:
-            ema_structure = "sideways"
-            ema_score = 0
-
-        # Price return score (last price vs 30 bars ago)
-        ret = df["close"].iloc[-1] / df["close"].iloc[0] - 1
-        ret_score = min(max(ret * 100, -10), 30)  # clamp -10%~30%
-
-        # Volume strength: last bar volume vs average
-        volume_avg = df["volume"].mean()
-        volume_last = df["volume"].iloc[-1]
-        volume_score = min((volume_last / volume_avg) * 10, 30)
-
-        total_score = ema_score + ret_score + volume_score
-        return {
-            "score": round(total_score, 2),
-            "return_1h": round(ret * 100, 2),
-            "volume_change": round((volume_last / volume_avg - 1) * 100, 2),
-            "ema_structure": ema_structure
-        }
+import time
 
 
-    def scan_strong_symbols(self, volume_threshold=1.0, kline_limit=30, max_symbols=50):
-        ticker_df = get_all_tickers()
-        filtered_df = ticker_df[ticker_df["volume_usd_million"] > volume_threshold]
+def get_top_coins(read_cache=False):
+    if read_cache:
+        return DataIO.load("score_result")
+    fetcher = BinanceDataFetcher()
+    df_btc = fetcher.get_klines('BTCUSDT', interval="1h", total=100)
+    scorer = EnhancedStrengthScorer(df_btc)
+    tickers = fetcher.get_all_usdt_pairs()
+    results = []
 
-        if len(filtered_df) > max_symbols:
-            filtered_df = filtered_df.sort_values(by="volume_usd_million", ascending=False).head(max_symbols)
+    for symbol in tqdm(tickers, desc="Scoring Tickers"):
+        try:
+            df = fetcher.get_klines(symbol, interval="1h", total=100)
+            score_dict = scorer.score(df, symbol)
+            if isinstance(score_dict, dict) and "final_score" in score_dict:
+                results.append(score_dict)
+            else:
+                print(f"{symbol}: no score")
+            time.sleep(0.2)
 
-        top_symbols = filtered_df["instId"].tolist()
-        results = []
+        except Exception as e:
+            print(f"Error processing {symbol}: {e}")
+            continue
 
-        for symbol in top_symbols:
-            try:
-                df = get_kline(symbol, bar="1H", limit=kline_limit)
-                if len(df) < 10:
-                    continue
-                score_data = self.compute_trend_score(df)
-                results.append({
-                    "symbol": symbol,
-                    "score": score_data["score"],
-                    "1h_return(%)": score_data["return_1h"],
-                    "volume_change(%)": score_data["volume_change"],
-                    "EMA_structure": score_data["ema_structure"]
-                })
-                sleep(0.1)
-            except Exception as e:
-                print(f"Error on {symbol}: {e}")
-                continue
+    df_result = pd.DataFrame(results).sort_values(by="final_score", ascending=False)
+    # 保存评分数据
+    DataIO.save(df_result, "score_result")
+    return df_result
 
-        df_result = pd.DataFrame(results).sort_values(by="score", ascending=False)
-        return df_result
+
+def get_top_categories(df_score):
+    from database.db_manager import DBManager
+
+    # Step 2: 读取 symbol 对应的所有 category 信息（多对多）
+    db = DBManager()
+    symbol_categories = db.get_all_categories()  # 应该返回 DataFrame: symbol, category
+    db.close()
+
+    # Step 3: 合并
+    df_merged = df_score.merge(symbol_categories, on="symbol", how="left")  # 多行对应多category
+
+    # Step 4: 按 category 聚合
+    df_category = (
+        df_merged.groupby("category")
+        .agg(
+            avg_score=("final_score", "mean"),
+            count=("symbol", "count")
+        )
+        .sort_values(by="avg_score", ascending=False)
+        .reset_index()
+    )
+
+    return df_category
+
 
 if __name__ == "__main__":
-    s=Scanner()
-    res = s.scan_strong_symbols()
-    print(res)
+    print("\n最强势币种:")
+    df = get_top_coins()
+    print(df)
+    # print("\n最强势板块:")
+    # print(get_top_categories(df))

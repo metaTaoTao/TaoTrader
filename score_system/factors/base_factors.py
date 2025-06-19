@@ -16,17 +16,17 @@ VOLUME_SCORE_MAP = {
 }
 
 
-class BasicStrengthScorer:
+class EnhancedStrengthScorer:
     def __init__(self, weights=None):
-        # Default weights for return, trend (EMA), and volume
         self.weights = weights or {
-            'return': 0.4,
-            'ema': 0.4,
-            'volume': 0.2
+            'return': 0.3,
+            'ema': 0.25,
+            'volume': 0.15,
+            'rsi': 0.15,
+            'momentum': 0.15
         }
 
     def compute_return_score(self, df):
-        # Use 1h, 4h, and 24h return (assuming df is 1h frequency and sorted ascending)
         periods = {'1h': 1, '4h': 4, '24h': 24}
         score = 0
         total_weight = 0
@@ -36,7 +36,7 @@ class BasicStrengthScorer:
                 weighted_score = np.clip(ret * 10, -1, 1)  # normalize to [-1, 1]
                 score += weighted_score
                 total_weight += 1
-        return (score / total_weight + 1) / 2 if total_weight > 0 else 0.5  # normalize to [0, 1]
+        return (score / total_weight + 1) / 2 if total_weight > 0 else 0.5
 
     def compute_ema_score(self, df):
         df = df.copy()
@@ -58,30 +58,66 @@ class BasicStrengthScorer:
 
         score = 0
         total_weight = 0
-
         for p in periods:
             if len(df) < p:
                 continue
-
             segment = df.iloc[-p:]
             mapped_scores = segment['volume_category'].map(VOLUME_SCORE_MAP).dropna()
             if not mapped_scores.empty:
-                avg_score = mapped_scores.mean()
-                score += avg_score
+                score += mapped_scores.mean()
                 total_weight += 1
 
         return score / total_weight if total_weight > 0 else 0.5
-        return score
+
+    def compute_rsi_score(self, df, period=14):
+        delta = df['close'].diff()
+        gain = np.where(delta > 0, delta, 0)
+        loss = np.where(delta < 0, -delta, 0)
+
+        avg_gain = pd.Series(gain).rolling(window=period).mean()
+        avg_loss = pd.Series(loss).rolling(window=period).mean()
+
+        rs = avg_gain / (avg_loss + 1e-6)
+        rsi = 100 - (100 / (1 + rs))
+        latest_rsi = rsi.iloc[-1]
+
+        # Score based on RSI value: closer to 70 = stronger
+        if latest_rsi >= 70:
+            return 1.0
+        elif latest_rsi >= 60:
+            return 0.8
+        elif latest_rsi >= 50:
+            return 0.6
+        elif latest_rsi >= 40:
+            return 0.4
+        else:
+            return 0.2
+
+    def compute_momentum_score(self, df):
+        scores = []
+        periods = [1, 4, 24]
+        for p in periods:
+            if len(df) > p:
+                ret = (df['close'].iloc[-1] - df['close'].iloc[-p - 1]) / df['close'].iloc[-p - 1]
+                scores.append(np.clip(ret * 10, -1, 1))
+        if not scores:
+            return 0.5
+        avg = np.mean(scores)
+        return (avg + 1) / 2
 
     def score(self, df: pd.DataFrame, symbol: str):
         return_score = self.compute_return_score(df)
         ema_score = self.compute_ema_score(df)
         volume_score = self.compute_volume_score(df)
+        rsi_score = self.compute_rsi_score(df)
+        momentum_score = self.compute_momentum_score(df)
 
         total_score = (
-                return_score * self.weights['return'] +
-                ema_score * self.weights['ema'] +
-                volume_score * self.weights['volume']
+            return_score * self.weights['return'] +
+            ema_score * self.weights['ema'] +
+            volume_score * self.weights['volume'] +
+            rsi_score * self.weights['rsi'] +
+            momentum_score * self.weights['momentum']
         )
 
         return {
@@ -89,15 +125,16 @@ class BasicStrengthScorer:
             'return_score': round(return_score, 3),
             'ema_score': round(ema_score, 3),
             'volume_score': round(volume_score, 3),
-            'basic_score': round(total_score, 3)
+            'rsi_score': round(rsi_score, 3),
+            'momentum_score': round(momentum_score, 3),
+            'enhanced_score': round(total_score, 3)
         }
-
 
 def get_top_coins(read_cache=False):
     if read_cache:
         return DataIO.load("score_result")
     fetcher = OKXDataFetcher()
-    scorer = BasicStrengthScorer()
+    scorer = EnhancedStrengthScorer()
     tickers = fetcher.get_all_tickers()['instId'].tolist()[:100]
 
     results = []

@@ -3,6 +3,7 @@ import okx.MarketData as MarketData
 import time
 from datetime import datetime
 from dateutil import tz
+from binance.client import Client
 
 
 class OKXDataFetcher:
@@ -112,3 +113,64 @@ class OKXDataFetcher:
 
         df = df.sort_values(by='volume_usd_million', ascending=False)
         return df
+
+class BinanceDataFetcher:
+    def __init__(self):
+        self.client = Client()
+
+    def get_all_usdt_pairs(self):
+        info = self.client.get_exchange_info()
+        symbols = [s['symbol'] for s in info['symbols'] if s['quoteAsset'] == 'USDT' and s['status'] == 'TRADING']
+        return symbols
+
+    def get_klines(self, symbol: str, interval: str = '1h', total: int = 300):
+        limit_per_call = 1000
+        klines_all = []
+        end_time = None
+
+        while len(klines_all) < total:
+            limit = min(limit_per_call, total - len(klines_all))
+            data = self.client.get_klines(symbol=symbol, interval=interval, endTime=end_time, limit=limit)
+
+            if not data:
+                break
+
+            klines_all.extend(data)
+            end_time = data[0][0] - 1  # 下一轮以当前最早时间往前翻
+            time.sleep(0.5)  # 防止速率限制
+
+        # 转为 DataFrame
+        df = pd.DataFrame(klines_all, columns=[
+            "timestamp", "open", "high", "low", "close",
+            "volume", "close_time", "quote_asset_volume",
+            "number_of_trades", "taker_buy_base_volume",
+            "taker_buy_quote_volume", "ignore"
+        ])
+        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+        df[["open", "high", "low", "close", "volume"]] = df[["open", "high", "low", "close", "volume"]].astype(float)
+        df = df[["timestamp", "open", "high", "low", "close", "volume"]]
+        df.set_index("timestamp", inplace=True)
+        df.sort_index(inplace=True)
+        return df
+    def get_top_usdt_pairs_by_volume(self, top_n=50):
+        tickers = self.client.get_ticker()
+        df = pd.DataFrame(tickers)
+        df = df[df['symbol'].str.endswith('USDT')].copy()
+        df['quoteVolume'] = pd.to_numeric(df['quoteVolume'], errors='coerce')
+        df = df.sort_values(by='quoteVolume', ascending=False)
+        return df[['symbol', 'quoteVolume']].head(top_n)
+
+
+if __name__ == "__main__":
+    fetcher = BinanceDataFetcher()
+    all_tickers = fetcher.get_all_usdt_pairs()
+
+    top_pairs = fetcher.get_top_usdt_pairs_by_volume(10)
+    print("Top 10 USDT pairs by volume:")
+    print(top_pairs)
+
+    symbol = top_pairs.iloc[0]['symbol']
+    df = fetcher.get_klines(symbol=symbol, interval='1h', total=1000)
+    print(f"\nLatest 1h Klines for {symbol}:")
+    print(df.tail())
+
