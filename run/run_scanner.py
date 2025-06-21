@@ -1,10 +1,9 @@
-# scheduler_runner.py
-import time
+# scanner_runner.py
 import traceback
 from score_system.scanner import get_top_coins
 from utils.file_helper import DataIO
 
-TIMEFRAMES = ["1h", "4h"]  # 可扩展多个时间维度
+TIMEFRAMES = ["1h", "4h"]
 
 def run_scan_and_save():
     for tf in TIMEFRAMES:
@@ -16,8 +15,5 @@ def run_scan_and_save():
             traceback.print_exc()
 
 if __name__ == "__main__":
-    print("🚀 Hourly Scanner Running...")
-    while True:
-        run_scan_and_save()
-        print("✅ Scan complete. Sleeping 1 hour...\n")
-        time.sleep(3600)
+    print("🚀 Running hourly scan task")
+    run_scan_and_save()
