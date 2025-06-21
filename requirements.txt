@@ -1,0 +1,9 @@
+pandas
+python-okx
+python-binance
+tabulate
+mplfinance
+python-telegram-bot==22.1
+schedule
+python-dotenv
+tqdm

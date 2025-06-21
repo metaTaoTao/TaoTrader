@@ -1,0 +1,7 @@
+# Backtest Environment Settings
+
+initial_capital: 100000        # Starting capital in USD
+commission_pct: 0.001          # Commission per trade (0.1%)
+slippage_pct: 0.0005           # Slippage per trade (0.05%)
+data_frequency: '1h'           # Candle frequency
+benchmark: 'BTC-USDT'          # Optional benchmark
