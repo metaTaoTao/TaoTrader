@@ -17,7 +17,7 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         args = context.args
         timeframe = str.lower(args[0]) if len(args) >= 1 else "1h"
-        sort_key = args[1] if len(args) >= 2 else "final_score"
+        sort_key = args[1]+'_score' if len(args) >= 2 else "final_score"
 
         data_obj = DataIO.load(f'scores_{timeframe}')
         timestamp = data_obj.get("timestamp", "N/A")
@@ -48,14 +48,14 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 🧠 当前评分维度：`{sort_key}`
 🧩 可用评分维度：
-- `final_score`：综合评分
-- `return_score`：涨跌幅评分
-- `trend_score`：趋势评分
-- `volume_score`：成交量评分
-- `alpha_score`：Alpha收益评分
-- `narrative_score`：叙事热度评分
+- `final`：综合评分
+- `return`：涨跌幅评分
+- `trend`：趋势评分
+- `volume`：成交量评分
+- `alpha`：Alpha收益评分
+- `narrative`：叙事热度评分
 
-📎 示例：`/scan trend_score 4h`
+📎 示例：`/scan trend 4h`
 📎 完整榜单已附加为文件发送。
 """
 

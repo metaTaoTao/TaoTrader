@@ -1,29 +1,26 @@
-# file: utils/io_helper.py
-
 import os
-import pandas as pd
-import config
+import pickle
+
 
 class DataIO:
     @staticmethod
-    def save(df: pd.DataFrame, name: str):
-        """
-        Save DataFrame to a pickle file (overwrites if exists).
-        """
-        output_dir = config.OUTPUT_DIR
-        os.makedirs(output_dir, exist_ok=True)
-        path = os.path.join(output_dir, f"{name}.pkl")
-        df.to_pickle(path)
-        print(f"✅ Saved: {path}")
+    def save(obj, filename, folder="output"):
+        os.makedirs(folder, exist_ok=True)
+        path = os.path.join(folder, f"{filename}.pkl")
+
+        # 判断对象是否为 DataFrame 或 dict
+        if hasattr(obj, "to_pickle"):
+            obj.to_pickle(path)
+        else:
+            with open(path, "wb") as f:
+                pickle.dump(obj, f)
+        print(f"Saved: {path}")
 
     @staticmethod
-    def load(name: str) -> pd.DataFrame:
-        """
-        Load DataFrame from a pickle file.
-        """
-        output_dir = config.OUTPUT_DIR
-        path = os.path.join(output_dir, f"{name}.pkl")
-        if not os.path.exists(path):
-            raise FileNotFoundError(f"No such file: {path}")
-        print(f"📦 Loaded: {path}")
-        return pd.read_pickle(path)
+    def load(filename, folder="output"):
+        path = os.path.join(folder, f"{filename}.pkl")
+        with open(path, "rb") as f:
+            print(f"Loaded: {path}")
+            return pickle.load(f)
+
+
