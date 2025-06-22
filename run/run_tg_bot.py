@@ -37,12 +37,11 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         df_sorted = df.sort_values(sort_key, ascending=False).reset_index(drop=True)
         df_sorted.index += 1  # Rank starts from 1
 
-        # 📋 Top 30 as preview
         preview_table = tabulate(
             df_sorted[["symbol", sort_key]].head(10),
             headers=["Rank", "Symbol", "Score"],
-            tablefmt="rounded_grid",  # 更漂亮
-            showindex=range(1, 11),
+            tablefmt="plain",
+            showindex=True,
             floatfmt=".3f"
         )
         preview_message = f"""📊 Top 10 Tokens by {timeframe.upper()} `{sort_key}`
