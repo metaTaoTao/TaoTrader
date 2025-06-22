@@ -49,19 +49,19 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         {preview_table}
 
-        🧠 当前评分维度：`{sort_key}`
+🧠 当前评分维度：`{sort_key}`
 
-        📌 可用评分维度说明：
-        - `final`：综合打分，平衡趋势、量能、情绪与基本面
-        - `return`：涨跌幅评分（近 1h/4h/1d）
-        - `ema`：趋势评分（EMA 多头排列判定）
-        - `volume`：成交量评分（基于交易热度）
-        - `rsi`：RSI 反转信号（超买/超卖分数）
-        - `momentum`：Alpha评分（剥离Beta后的相对收益）
-        - `narrative`：叙事热度（🚧 开发中）
+📌 可用评分维度说明：
+- `final`：综合打分，平衡趋势、量能、情绪与基本面
+- `return`：涨跌幅评分（近 1h/4h/1d）
+- `ema`：趋势评分（EMA 多头排列判定）
+- `volume`：成交量评分（基于交易热度）
+- `rsi`：RSI 反转信号（超买/超卖分数）
+- `momentum`：Alpha评分（剥离Beta后的相对收益）
+- `narrative`：叙事热度（🚧 开发中）
 
-        📎 示例：`/scan final 1h`
-        📎 完整榜单已附加为文档发送。
+📎 示例：`/scan final 1h`
+📎 完整榜单已附加为文档发送。
         """
 
         await update.message.reply_text(preview_message)
