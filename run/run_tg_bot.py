@@ -1,9 +1,12 @@
-# bot_main.py
+import sys
+import os
+
+# 自动将项目根路径添加到 sys.path 中
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from score_system.scanner import get_top_coins  # 假设你已有打分模块
 from utils.file_helper import DataIO
 
 # 启用日志
