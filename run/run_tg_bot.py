@@ -19,8 +19,8 @@ import tempfile
 async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         args = context.args
-        timeframe = str.lower(args[0]) if len(args) >= 1 else "1h"
-        sort_key = args[1]+'_score' if len(args) >= 2 else "final_score"
+        sort_key = args[0] + '_score' if len(args) >= 1 else "final_score"
+        timeframe = str.lower(args[1]) if len(args) >= 2 else "1h"
 
         data_obj = DataIO.load(f'scores_{timeframe}')
         timestamp = data_obj.get("timestamp", "N/A")
@@ -38,13 +38,13 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # 📋 Top 30 as preview
         preview_table = tabulate(
-            df_sorted[["symbol", sort_key]].head(30),
+            df_sorted[["symbol", sort_key]].head(10),
             headers=["Symbol", sort_key],
             tablefmt="github",
             showindex=True,
             floatfmt=".3f"
         )
-        preview_message = f"""📊 Top 30 Tokens by {timeframe.upper()} `{sort_key}`:
+        preview_message = f"""📊 Top 10 Tokens by {timeframe.upper()} `{sort_key}`:
 📅 扫描时间：{timestamp}
 
 {preview_table}
