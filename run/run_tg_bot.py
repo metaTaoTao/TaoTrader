@@ -40,29 +40,30 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # 📋 Top 30 as preview
         preview_table = tabulate(
             df_sorted[["symbol", sort_key]].head(10),
-            headers=["Symbol", sort_key],
-            tablefmt="github",
-            showindex=True,
+            headers=["Rank", "Symbol", "Score"],
+            tablefmt="rounded_grid",  # 更漂亮
+            showindex=range(1, 11),
             floatfmt=".3f"
         )
-        preview_message = f"""📊 Top 10 Tokens by {timeframe.upper()} `{sort_key}`:
-📅 扫描时间：{timestamp}
+        preview_message = f"""📊 Top 10 Tokens by {timeframe.upper()} `{sort_key}`
+        📅 扫描时间：{timestamp.strftime("%Y-%m-%d %H:%M:%S")}
 
-{preview_table}
+        {preview_table}
 
-🧠 当前评分维度：`{sort_key}`
-🧩 可用评分维度：
-- `final`：综合评分
-- `return`：涨跌幅评分
-- `ema`：趋势评分, EMA 多头排列（ema5 > ema10 > ema20）代表趋势强劲，否则弱
-- `volume`：成交量评分, 利用 VolumeHeatmap 对近期交易量进行分类评分，衡量资金活跃度
-- 'rsi': RSI 反转预警机制：超买弱（<0.5），超卖强（>0.5），中间地带为中性
-- `momentum`：Alpha收益评分, 计算相对动量（alpha）：剥离beta后的超额收益，衡量是否跑赢BTC
-- `narrative`：叙事热度评分, 还未实现
+        🧠 当前评分维度：`{sort_key}`
 
-📎 示例：`/scan return 1h`
-📎 完整榜单已附加为文件发送。
-"""
+        📌 可用评分维度说明：
+        - `final`：综合打分，平衡趋势、量能、情绪与基本面
+        - `return`：涨跌幅评分（近 1h/4h/1d）
+        - `ema`：趋势评分（EMA 多头排列判定）
+        - `volume`：成交量评分（基于交易热度）
+        - `rsi`：RSI 反转信号（超买/超卖分数）
+        - `momentum`：Alpha评分（剥离Beta后的相对收益）
+        - `narrative`：叙事热度（🚧 开发中）
+
+        📎 示例：`/scan final 1h`
+        📎 完整榜单已附加为文档发送。
+        """
 
         await update.message.reply_text(preview_message)
 
