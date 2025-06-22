@@ -1,5 +1,9 @@
 # run/scanner_entry.py
+import sys
+import os
 
+# 自动添加项目根目录到 sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import sys
 from datetime import datetime
 from score_system.scanner import get_top_coins
