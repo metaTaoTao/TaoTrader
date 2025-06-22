@@ -46,7 +46,7 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             floatfmt=".3f"
         )
         preview_message = f"""📊 Top 10 Tokens by {timeframe.upper()} `{sort_key}`
-        📅 扫描时间：{timestamp.strftime("%Y-%m-%d %H:%M:%S")}
+        📅 扫描时间：{timestamp}
 
         {preview_table}
 
