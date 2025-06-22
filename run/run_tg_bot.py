@@ -19,7 +19,9 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         timeframe = str.lower(args[0]) if len(args) >= 1 else "1h"
         sort_key = args[1] if len(args) >= 2 else "final_score"
 
-        df = DataIO.load(f'scores_{timeframe}')
+        data_obj = DataIO.load(f'scores_{timeframe}')
+        timestamp = data_obj.get("timestamp", "N/A")
+        df = data_obj['data']
 
         if sort_key not in df.columns:
             await update.message.reply_text(
@@ -39,8 +41,8 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             showindex=True,
             floatfmt=".3f"
         )
-
         preview_message = f"""📊 Top 30 Tokens by {timeframe.upper()} `{sort_key}`:
+📅 扫描时间：{timestamp}
 
 {preview_table}
 

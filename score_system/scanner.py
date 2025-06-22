@@ -6,11 +6,9 @@ import pandas as pd
 import time
 
 
-def get_top_coins(read_cache=False, timeframe='1h', sort_key='final_score'):
-    if read_cache:
-        return DataIO.load("score_result")
+def get_top_coins(timeframe='1h', sort_key='final_score'):
     fetcher = BinanceDataFetcher()
-    df_btc = fetcher.get_klines('BTCUSDT', interval="1h", total=100)
+    df_btc = fetcher.get_klines('BTCUSDT', interval=timeframe, total=100)
     scorer = EnhancedStrengthScorer(df_btc)
     tickers = fetcher.get_all_usdt_pairs()
     results = []
@@ -30,8 +28,6 @@ def get_top_coins(read_cache=False, timeframe='1h', sort_key='final_score'):
             continue
 
     df_result = pd.DataFrame(results).sort_values(by=sort_key, ascending=False)
-    # 保存评分数据
-    DataIO.save(df_result, "score_result")
     return df_result
 
 
