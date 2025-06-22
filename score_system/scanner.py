@@ -55,10 +55,3 @@ def get_top_categories(df_score):
 
     return df_category
 
-
-if __name__ == "__main__":
-    print("\n最强势币种:")
-    df = get_top_coins()
-    print(df)
-    # print("\n最强势板块:")
-    # print(get_top_categories(df))

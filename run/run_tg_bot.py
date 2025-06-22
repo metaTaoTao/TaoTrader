@@ -29,7 +29,8 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if sort_key not in df.columns:
             await update.message.reply_text(
                 f"⚠️ Invalid score key: `{sort_key}`\n\n可选项包括：\n"
-                "`final_score`, `return_score`, `trend_score`, `volume_score`, `alpha_score`, `narrative_score`"
+                 'return_score', 'ema_score', 'volume_score', 'rsi_score',
+          'momentum_score', 'final_score'
             )
             return
 
@@ -53,12 +54,13 @@ async def scan_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 🧩 可用评分维度：
 - `final`：综合评分
 - `return`：涨跌幅评分
-- `trend`：趋势评分
-- `volume`：成交量评分
-- `alpha`：Alpha收益评分
-- `narrative`：叙事热度评分
+- `ema`：趋势评分, EMA 多头排列（ema5 > ema10 > ema20）代表趋势强劲，否则弱
+- `volume`：成交量评分, 利用 VolumeHeatmap 对近期交易量进行分类评分，衡量资金活跃度
+- 'rsi': RSI 反转预警机制：超买弱（<0.5），超卖强（>0.5），中间地带为中性
+- `momentum`：Alpha收益评分, 计算相对动量（alpha）：剥离beta后的超额收益，衡量是否跑赢BTC
+- `narrative`：叙事热度评分, 还未实现
 
-📎 示例：`/scan trend 4h`
+📎 示例：`/scan return 1h`
 📎 完整榜单已附加为文件发送。
 """
 
