@@ -1,0 +1,16 @@
+{
+  "tickers": [
+    "BTCUSDT",
+    "ETHUSDT", 
+    "MEUSDT",
+    "DEXEUSDT",
+    "PERPUSDT",
+    "ADAUSDT",
+    "SOLUSDT",
+    "BNBUSDT",
+    "XRPUSDT",
+    "DOTUSDT"
+  ],
+  "description": "主要交易对列表",
+  "last_modified": "2025-01-21"
+}
