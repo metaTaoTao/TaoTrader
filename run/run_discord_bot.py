@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 class TaoTraderBot(commands.Bot):
     """TaoTrader Discord Bot"""
     
-    def __init__(self):
+    def __init__(self, allowed_channels=None):
         intents = discord.Intents.default()
         
         super().__init__(
@@ -40,6 +40,9 @@ class TaoTraderBot(commands.Bot):
             intents=intents,
             help_command=None
         )
+        
+        # 允许的频道ID列表，None表示所有频道
+        self.allowed_channels = allowed_channels or []
     
     async def setup_hook(self):
         """Bot启动时的初始化"""
@@ -52,6 +55,11 @@ class TaoTraderBot(commands.Bot):
         except Exception as e:
             logger.error(f"❌ 同步slash命令失败: {e}")
     
+    def is_allowed_channel(self, channel_id):
+        """检查频道是否被允许"""
+        if not self.allowed_channels:  # 如果没有设置限制，允许所有频道
+            return True
+        return channel_id in self.allowed_channels
     
     
     async def on_command_error(self, ctx, error):
@@ -77,8 +85,18 @@ class TaoTraderBot(commands.Bot):
         except:
             await ctx.send(f"❌ 命令执行错误: {str(error)}")
 
+# 从环境变量获取允许的频道ID
+ALLOWED_CHANNELS = []
+allowed_channels_str = os.getenv('DISCORD_ALLOWED_CHANNELS')
+if allowed_channels_str:
+    try:
+        ALLOWED_CHANNELS = [int(ch_id.strip()) for ch_id in allowed_channels_str.split(',')]
+        logger.info(f"📋 限制频道: {ALLOWED_CHANNELS}")
+    except ValueError:
+        logger.warning("⚠️ DISCORD_ALLOWED_CHANNELS格式错误，允许所有频道")
+
 # 创建Bot实例
-bot = TaoTraderBot()
+bot = TaoTraderBot(allowed_channels=ALLOWED_CHANNELS)
 
 @bot.event
 async def on_ready():
@@ -96,12 +114,18 @@ async def on_ready():
 @bot.tree.command(name="help", description="显示所有可用的命令和用法")
 async def slash_help(interaction: discord.Interaction):
     """Slash命令版本的help"""
+    if not bot.is_allowed_channel(interaction.channel_id):
+        await interaction.response.send_message("❌ 此频道不允许使用Bot命令", ephemeral=True)
+        return
     await help_command(interaction)
 
 @bot.tree.command(name="ticker", description="查询币种详细信息")
 @app_commands.describe(symbol="币种符号，如: BTCUSDT, ETHUSDT")
 async def slash_ticker(interaction: discord.Interaction, symbol: str):
     """Slash命令版本的ticker查询"""
+    if not bot.is_allowed_channel(interaction.channel_id):
+        await interaction.response.send_message("❌ 此频道不允许使用Bot命令", ephemeral=True)
+        return
     await ticker_command(interaction, symbol)
 
 @bot.tree.command(name="score", description="查询特定币种的评分")
@@ -111,6 +135,9 @@ async def slash_ticker(interaction: discord.Interaction, symbol: str):
 )
 async def slash_score(interaction: discord.Interaction, symbol: str, timeframe: str = "1h"):
     """Slash命令版本的score查询"""
+    if not bot.is_allowed_channel(interaction.channel_id):
+        await interaction.response.send_message("❌ 此频道不允许使用Bot命令", ephemeral=True)
+        return
     await score_command(interaction, symbol, timeframe)
 
 @bot.tree.command(name="scan", description="显示评分排行榜")
@@ -120,6 +147,9 @@ async def slash_score(interaction: discord.Interaction, symbol: str, timeframe: 
 )
 async def slash_scan(interaction: discord.Interaction, score_type: str = "final", timeframe: str = "1h"):
     """Slash命令版本的scan查询"""
+    if not bot.is_allowed_channel(interaction.channel_id):
+        await interaction.response.send_message("❌ 此频道不允许使用Bot命令", ephemeral=True)
+        return
     await scan_command(interaction, score_type, timeframe)
 
 # 传统命令支持（以!开头）
