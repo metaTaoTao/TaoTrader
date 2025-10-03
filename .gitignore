@@ -1,6 +1,167 @@
-.idea/
-.venv/
+# Python
 __pycache__/
-*.pyc
-.ipynb_checkpoints/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment Variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+logs/
+log/
+discord_bot.log
+discord_alert.log
+pull_output.log
+mapping_update.log
+*.log.*
+
+# Data Files
+*.pkl
+*.pickle
+*.csv
+*.json
+*.txt
+*.xlsx
+*.xls
+
+# Cache Files
+*.cache
+cache/
+.cache/
+coingecko_cache*.pkl
+
+# Output Files
+output/
+scores_*.pkl
+coin_mapping_table.csv
+binance_usdt_pairs.json
+
+# Backup Files
+*.backup
+*.bak
+backups/
+*_backup_*
+coin_mapping_table.csv.backup_*
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration (keep templates, ignore actual configs)
+configs/*.yaml
+configs/*.yml
+!configs/*.template.*
+
+# Bot Tokens and Secrets
+*_token.txt
+*_secret.txt
+bot_token.txt
+discord_token.txt
+
+# Test Files
+test_*.py
+*_test.py
+tests/
+
+# Documentation Build
+docs/_build/
+site/
+
+# Coverage Reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Profiling
+.prof
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Server specific
+nohup.out
+*.pid
+
+# Trading specific
+trades/
+positions/
+orders/
+portfolio/
+
+# Scanner specific
+scanner_output/
+scan_results/
