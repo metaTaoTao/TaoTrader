@@ -43,6 +43,10 @@ async def scan_command(interaction, score_type: str = "final", timeframe: str = 
         
         # 加载评分数据
         try:
+            import os
+            print(f"Discord scan命令 - 当前工作目录: {os.getcwd()}")
+            print(f"Discord scan命令 - 正在加载: scores_{timeframe}")
+            
             data_obj = DataIO.load(f'scores_{timeframe}')
             if isinstance(data_obj, dict) and "data" in data_obj:
                 df = data_obj["data"]
@@ -51,6 +55,9 @@ async def scan_command(interaction, score_type: str = "final", timeframe: str = 
                 # 如果数据直接是DataFrame
                 df = data_obj
                 timestamp = "N/A"
+            
+            print(f"Discord scan命令 - 数据形状: {df.shape}")
+            print(f"Discord scan命令 - 前3名币种: {df.nlargest(3, 'final_score')['symbol'].tolist()}")
         except Exception as e:
             embed = discord.Embed(
                 title="❌ 数据加载失败",
