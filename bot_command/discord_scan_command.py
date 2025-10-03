@@ -44,8 +44,13 @@ async def scan_command(interaction, score_type: str = "final", timeframe: str = 
         # 加载评分数据
         try:
             data_obj = DataIO.load(f'scores_{timeframe}')
-            timestamp = data_obj.get("timestamp", "N/A")
-            df = data_obj['data']
+            if isinstance(data_obj, dict) and "data" in data_obj:
+                df = data_obj["data"]
+                timestamp = data_obj.get("timestamp", "N/A")
+            else:
+                # 如果数据直接是DataFrame
+                df = data_obj
+                timestamp = "N/A"
         except Exception as e:
             embed = discord.Embed(
                 title="❌ 数据加载失败",

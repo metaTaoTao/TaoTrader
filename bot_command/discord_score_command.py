@@ -44,12 +44,13 @@ async def score_command(interaction, symbol: str, timeframe: str = "1h"):
 
         # 加载评分数据
         try:
-            data = DataIO.load(f'scores_{timeframe}')
-            if isinstance(data, dict) and "data" in data:
-                df = data["data"]
-                timestamp = data.get("timestamp", "")
+            data_obj = DataIO.load(f'scores_{timeframe}')
+            if isinstance(data_obj, dict) and "data" in data_obj:
+                df = data_obj["data"]
+                timestamp = data_obj.get("timestamp", "")
             else:
-                df = data
+                # 如果数据直接是DataFrame
+                df = data_obj
                 timestamp = ""
         except Exception as e:
             embed = discord.Embed(
