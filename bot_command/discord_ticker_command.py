@@ -78,7 +78,13 @@ async def ticker_command(interaction, symbol: str):
                 inline=False
             )
             
+            if not interaction.response.is_done():
+                if not interaction.response.is_done():
             await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.followup.send(embed=embed)
+            else:
+                await interaction.followup.send(embed=embed)
             return
 
         ticker = symbol.upper()
@@ -97,7 +103,13 @@ async def ticker_command(interaction, symbol: str):
                 inline=False
             )
             
+            if not interaction.response.is_done():
+                if not interaction.response.is_done():
             await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.followup.send(embed=embed)
+            else:
+                await interaction.followup.send(embed=embed)
             return
         
         # 从本地数据查找ticker信息
@@ -122,7 +134,13 @@ async def ticker_command(interaction, symbol: str):
                 inline=False
             )
             
+            if not interaction.response.is_done():
+                if not interaction.response.is_done():
             await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.followup.send(embed=embed)
+            else:
+                await interaction.followup.send(embed=embed)
             return
         
         # 格式化数字显示
@@ -263,7 +281,10 @@ async def ticker_command(interaction, symbol: str):
         )
         embed.timestamp = discord.utils.utcnow()
         
-        await interaction.response.send_message(embed=embed)
+        if not interaction.response.is_done():
+            await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.followup.send(embed=embed)
         
     except Exception as e:
         error_embed = discord.Embed(
@@ -278,6 +299,16 @@ async def ticker_command(interaction, symbol: str):
         )
         
         try:
-            await interaction.response.send_message(embed=error_embed)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(embed=error_embed)
+            else:
+                await interaction.followup.send(embed=error_embed)
         except:
-            await interaction.response.send_message(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+            try:
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+                else:
+                    await interaction.followup.send(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+            except:
+                # 最后尝试发送到频道
+                await interaction.channel.send(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")

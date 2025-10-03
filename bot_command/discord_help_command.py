@@ -117,7 +117,10 @@ async def help_command(interaction):
     embed.timestamp = discord.utils.utcnow()
     
     try:
-        await interaction.response.send_message(embed=embed)
+        if not interaction.response.is_done():
+            await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.followup.send(embed=embed)
     except Exception as e:
         # 如果embed发送失败，发送纯文本版本
         help_text = """🤖 **TaoTrader Bot 使用指南**
@@ -168,4 +171,11 @@ async def help_command(interaction):
 
 📞 如有问题或建议，请联系管理员。"""
         
-        await interaction.response.send_message(help_text)
+        try:
+            if not interaction.response.is_done():
+                await interaction.response.send_message(help_text)
+            else:
+                await interaction.followup.send(help_text)
+        except:
+            # 最后尝试发送到频道
+            await interaction.channel.send(help_text)
