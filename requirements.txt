@@ -4,6 +4,7 @@ python-binance
 tabulate
 mplfinance
 python-telegram-bot==22.1
+discord.py>=2.3.0
 schedule
 python-dotenv
 tqdm

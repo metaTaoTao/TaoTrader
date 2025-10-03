@@ -306,15 +306,11 @@ def main():
     
     args = parser.parse_args()
     
-    print("🚀 正在初始化SectorFetcher...")
-    
     try:
         fetcher = SectorFetcher()
-        print(f"✅ 初始化完成！")
-
         results = []
+        
         for ticker in args.tickers:
-            print(f"\n正在分析 {ticker}...")
             coin_info = fetcher.get_coin_info(ticker)
             results.append({
                 'ticker': ticker,
@@ -327,15 +323,11 @@ def main():
             else:
                 print_coin_info(ticker, coin_info, "pretty")
         
-        # 批量JSON输出
         if args.json and len(args.tickers) > 1:
             output = {result['ticker']: result['info'] for result in results}
             print(json.dumps(output, indent=2, ensure_ascii=False))
-        
-        print(f"\n✨ 分析完成！")
             
     except KeyboardInterrupt:
-        print("\n⚠️ 用户中断操作")
         return 1
     except Exception as e:
         print(f"❌ 发生错误: {e}")

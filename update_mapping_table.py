@@ -371,14 +371,8 @@ def main():
         else:
             results = updater.update_tickers(tickers, args.force)
         
-        # 显示结果
-        logger.info(f"更新完成!")
-        logger.info(f"   总计: {results['total']}")
-        logger.info(f"   更新: {results['updated']}")
-        logger.info(f"   失败: {results['failed']}")
-        logger.info(f"   跳过: {results['skipped']}")
+        logger.info(f"更新完成! 总计: {results['total']}, 更新: {results['updated']}, 失败: {results['failed']}, 跳过: {results['skipped']}")
         
-        # 显示统计信息
         stats = updater.get_statistics()
         logger.info(f"当前映射表包含 {stats['total_coins']} 个币种")
         

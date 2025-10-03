@@ -1,6 +1,0 @@
-[2025-06-12 22:06:08] INFO - HTTP Request: GET https://www.okx.com/api/v5/market/candles?instId=BTC-USDT-SWAP&bar=4H&limit=300 "HTTP/2 200 OK"
-[2025-06-12 22:06:09] INFO - HTTP Request: GET https://www.okx.com/api/v5/market/candles?instId=BTC-USDT-SWAP&after=1745467200000&bar=4H&limit=300 "HTTP/2 200 OK"
-[2025-06-12 22:06:09] INFO - HTTP Request: GET https://www.okx.com/api/v5/market/candles?instId=BTC-USDT-SWAP&after=1741147200000&bar=4H&limit=300 "HTTP/2 200 OK"
-[2025-06-12 22:06:10] INFO - HTTP Request: GET https://www.okx.com/api/v5/market/candles?instId=BTC-USDT-SWAP&after=1736827200000&bar=4H&limit=300 "HTTP/2 200 OK"
-[2025-06-12 22:06:10] INFO - HTTP Request: GET https://www.okx.com/api/v5/market/candles?instId=BTC-USDT-SWAP&after=1732507200000&bar=4H&limit=300 "HTTP/2 200 OK"
-[2025-06-12 22:06:10] INFO - HTTP Request: GET https://www.okx.com/api/v5/market/candles?instId=BTC-USDT-SWAP&after=1729051200000&bar=4H&limit=60 "HTTP/2 200 OK"
