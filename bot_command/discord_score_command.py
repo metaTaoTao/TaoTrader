@@ -104,7 +104,10 @@ async def score_command(interaction, symbol: str, timeframe: str = "1h"):
                 inline=False
             )
             
-            await interaction.response.send_message(embed=embed)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(embed=embed)
+            else:
+                await interaction.followup.send(embed=embed)
             return
 
         row = row.iloc[0]
@@ -186,7 +189,10 @@ async def score_command(interaction, symbol: str, timeframe: str = "1h"):
         )
         embed.timestamp = discord.utils.utcnow()
         
-        await interaction.response.send_message(embed=embed)
+        if not interaction.response.is_done():
+            await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.followup.send(embed=embed)
 
     except Exception as e:
         error_embed = discord.Embed(
@@ -201,6 +207,16 @@ async def score_command(interaction, symbol: str, timeframe: str = "1h"):
         )
         
         try:
-            await interaction.response.send_message(embed=error_embed)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(embed=error_embed)
+            else:
+                await interaction.followup.send(embed=error_embed)
         except:
-            await interaction.response.send_message(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+            try:
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+                else:
+                    await interaction.followup.send(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+            except:
+                # 最后尝试发送到频道
+                await interaction.channel.send(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")

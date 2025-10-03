@@ -88,7 +88,10 @@ async def scan_command(interaction, score_type: str = "final", timeframe: str = 
                 inline=False
             )
             
-            await interaction.response.send_message(embed=embed)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(embed=embed)
+            else:
+                await interaction.followup.send(embed=embed)
             return
 
         # 排序数据
@@ -155,7 +158,10 @@ async def scan_command(interaction, score_type: str = "final", timeframe: str = 
         embed.timestamp = discord.utils.utcnow()
         
         # 发送预览消息
-        await interaction.response.send_message(embed=embed)
+        if not interaction.response.is_done():
+            await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.followup.send(embed=embed)
 
         # 创建完整榜单文件
         full_table = tabulate(
@@ -196,7 +202,11 @@ TaoTrader Bot | 数据仅供参考，投资需谨慎
             inline=False
         )
         
-        await interaction.followup.send(embed=followup_embed, file=file_obj)
+        try:
+            await interaction.followup.send(embed=followup_embed, file=file_obj)
+        except:
+            # 如果followup失败，尝试发送到频道
+            await interaction.channel.send(embed=followup_embed, file=file_obj)
 
     except Exception as e:
         error_embed = discord.Embed(
@@ -211,6 +221,16 @@ TaoTrader Bot | 数据仅供参考，投资需谨慎
         )
         
         try:
-            await interaction.response.send_message(embed=error_embed)
+            if not interaction.response.is_done():
+                await interaction.response.send_message(embed=error_embed)
+            else:
+                await interaction.followup.send(embed=error_embed)
         except:
-            await interaction.response.send_message(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+            try:
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+                else:
+                    await interaction.followup.send(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
+            except:
+                # 最后尝试发送到频道
+                await interaction.channel.send(f"❌ 查询出错: {str(e)}\n\n💡 请稍后重试或联系管理员")
