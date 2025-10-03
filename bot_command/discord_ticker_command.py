@@ -101,10 +101,7 @@ async def ticker_command(interaction, symbol: str):
             )
             
             if not interaction.response.is_done():
-                if not interaction.response.is_done():
-            await interaction.response.send_message(embed=embed)
-        else:
-            await interaction.followup.send(embed=embed)
+                await interaction.response.send_message(embed=embed)
             else:
                 await interaction.followup.send(embed=embed)
             return
