@@ -22,6 +22,10 @@ async def send_scan_alerts(bot, channel_id, alert_config=None):
     
     try:
         # 加载评分数据
+        import os
+        print(f"当前工作目录: {os.getcwd()}")
+        print(f"正在加载: scores_{alert_config['timeframe']}")
+        
         data_obj = DataIO.load(f'scores_{alert_config["timeframe"]}')
         if isinstance(data_obj, dict) and "data" in data_obj:
             df = data_obj["data"]
@@ -30,6 +34,9 @@ async def send_scan_alerts(bot, channel_id, alert_config=None):
             # 如果数据直接是DataFrame
             df = data_obj
             timestamp = "N/A"
+        
+        print(f"数据形状: {df.shape}")
+        print(f"前3名币种: {df.nlargest(3, 'final_score')['symbol'].tolist()}")
         
         # 获取前N名币种（相对强弱排行）
         top_coins = df.nlargest(alert_config['top_n'], 'final_score')

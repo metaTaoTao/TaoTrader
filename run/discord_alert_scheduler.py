@@ -103,6 +103,12 @@ class AlertScheduler:
 
 def main():
     """主函数"""
+    # 确保在正确的目录运行
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    os.chdir(project_root)
+    print(f"Discord推送调度器工作目录: {os.getcwd()}")
+    
     # 从环境变量获取配置
     bot_token = os.getenv('DISCORD_BOT_TOKEN')
     channel_id = int(os.getenv('DISCORD_ALERT_CHANNEL_ID', '0'))
