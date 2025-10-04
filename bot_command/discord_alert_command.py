@@ -95,8 +95,14 @@ async def send_scan_alerts(bot, channel_id, alert_config=None):
         # 发送到指定频道
         channel = bot.get_channel(channel_id)
         if channel:
+            print(f"📤 正在发送推送到频道: {channel.name} (ID: {channel_id})")
             await channel.send(embed=embed)
+            print(f"✅ 推送发送成功")
+        else:
+            print(f"❌ 找不到频道 ID: {channel_id}")
             
     except Exception as e:
         print(f"❌ 推送失败: {e}")
+        import traceback
+        traceback.print_exc()
 
