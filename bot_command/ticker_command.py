@@ -62,7 +62,7 @@ async def ticker_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "• Binance格式：`ANIMEUSDT`, `BTCUSDT`\n"
                 "• OKX格式：`ANIME-USDT`, `BTC-USDT`\n\n"
                 "💡 示例：`/ticker MEUSDT`\n"
-                "⚡ 数据来源：本地映射表（每日更新）", 
+                "⚡ 数据来源：CoinGecko（每日更新）", 
                 parse_mode="Markdown"
             )
             return
@@ -160,7 +160,7 @@ async def ticker_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message += "⚠️ 暂无板块分类数据\n"
         
         message += "\n" + "=" * 30
-        message += f"\n⚡ **数据来源**: 本地映射表"
+        message += f"\n⚡ **数据来源**: CoinGecko"
         if last_updated != 'N/A':
             message += f"\n🕒 **更新时间**: {last_updated}"
         message += f"\n💡 使用 `/ticker {ticker}` 再次查询"
