@@ -85,8 +85,8 @@ class AlertScheduler:
             while True:
                 current_time = datetime.now()
                 
-                # 每小时推送一次（整点推送）
-                if current_time.minute == 0:
+                # 每小时推送一次（延迟10分钟推送，确保扫描完成）
+                if current_time.minute == 10:
                     await self.send_regular_alert()
                     logger.info(f"✅ {current_time.strftime('%H:%M')} 推送完成")
                 
