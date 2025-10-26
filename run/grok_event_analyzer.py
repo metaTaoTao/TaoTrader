@@ -105,39 +105,16 @@ def analyze_with_grok_integration(data, auto_call=False, top_n=10):
     print(f"时间戳: {formatted_data['timestamp']}")
     print(f"候选币种 ({len(coin_symbols)}个): {symbols_text}")
     
-    # 构建提示词
-    prompt = f"""You are an advanced event-driven detector for crypto assets.
+    # 优化后的提示词（更简洁，减少token使用）
+    prompt = f"""请分析以下币种在过去72小时的事件驱动因素：
+{symbols_text}
 
-**Task:**
-1. 针对候选币种列表 {symbols_text}，在过去72小时内搜索以下渠道：
-   - Twitter/X 热点讨论（包括 trending topics, 高频关键词, 大V转发情况）
-   - 官方公告（项目方 Twitter, Medium, Discord/Telegram）
-   - GitHub Releases / Status 更新
-   - 主流加密媒体 (Coindesk, The Block, Decrypt, Binance News, OKX News 等)
-
-2. 对每个币种，提取所有**有效且可验证的事件**，并分类到以下类型：
-   {{listing, delisting, airdrop, unlock, partnership, hack/exploit, tokenomics_change, 
-    regulatory, product_release, liquidity_injection, whale_activity, lawsuit, rumor, clarification, other}}。
-
-3. 补充两个扩展分析：
-   - **X 热度评分**：衡量该事件在 Twitter/X 上的讨论度（帖子数、独立账号数、大V转发数）。
-   - **板块共振**：若该事件所属币种与某板块（如 AI, RWA, L2, DeFi, Meme）同时在过去72小时有多币热点事件，则标注板块，并加权分数。
-   - **重要性评分**：评估事件对价格的潜在影响强度（如大所 listing、监管、黑客事件权重高；小合作、二线消息权重低）。
-
-4. 根据事件 → 热度 → 板块共振 → 重要性，计算一个综合 **事件驱动分数 (0–100)**。
-
-5. 最终输出表格（中文），每一行一个币，包含：
-   - 币种
-   - 事件类型
-   - 事件标题 / 摘要
-   - 事件时间 (UTC)
-   - 热度评分 (0–100)
-   - 板块共振 (是/否 + 板块名)
-   - 重要性评分 (0–100)
-   - 综合事件驱动分数 (0–100)
-   - 来源链接 (至少1个)
-
-6. 输出时请将结果按照 "综合事件驱动分数" 从高到低排序。"""
+要求：
+1. 搜索：Twitter/X、官方公告、GitHub、主流媒体
+2. 分类：listing, delisting, airdrop, unlock, partnership, hack/exploit, tokenomics_change, regulatory, product_release, liquidity_injection, whale_activity, lawsuit, rumor, clarification, other
+3. 评分：热度(0-100)、板块共振、重要性(0-100)、综合事件驱动分数(0-100)
+4. 输出表格（中文）包含：币种|事件类型|事件摘要|时间(UTC)|热度|板块|重要性|综合分数|来源链接
+5. 按综合事件驱动分数排序"""
     
     if auto_call:
         # 自动调用Grok API

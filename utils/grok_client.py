@@ -25,16 +25,20 @@ class GrokClient:
         if not self.api_key:
             raise ValueError("❌ 未设置 GROK_API_KEY 环境变量")
     
-    def chat(self, messages: list, model: str = "grok-4") -> Dict:
+    def chat(self, messages: list, model: str = "grok-4-fast-reasoning") -> Dict:
         """
         调用 Grok Chat API
         
         Args:
             messages: 消息列表，格式为 [{"role": "user", "content": "..."}]
-            model: 模型名称，默认 "grok-beta"
+            model: 模型名称，默认 "grok-4-fast-reasoning" (需要推理能力用于正负面判断)
         
         Returns:
             Grok API 响应
+        
+        Note:
+            推荐的模型: grok-4-fast-reasoning (推理正负面、因果关系)
+            其他选项: grok-4-fast-non-reasoning (快速检索), grok-3-mini (最便宜)
         """
         url = f"{self.base_url}/chat/completions"
         
@@ -47,11 +51,13 @@ class GrokClient:
             "messages": messages,
             "model": model,
             "temperature": 0.7,
-            "max_tokens": 2000
+            "max_tokens": 2000,  # 减少token，降低成本和超时风险
+            "stream": False
         }
         
         try:
-            response = requests.post(url, headers=headers, json=data, timeout=30)
+            # 使用较长的超时，但也要及时失败避免浪费
+            response = requests.post(url, headers=headers, json=data, timeout=600)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
