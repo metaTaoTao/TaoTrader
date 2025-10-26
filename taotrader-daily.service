@@ -1,0 +1,18 @@
+[Unit]
+Description=TaoTrader Daily Alert Scheduler
+After=network.target
+
+[Service]
+Type=simple
+User=taozhangquant1
+WorkingDirectory=/home/taozhangquant1/TaoTrader
+Environment="DISCORD_BOT_TOKEN=YOUR_BOT_TOKEN"
+Environment="DISCORD_DAILY_CHANNEL_ID=YOUR_CHANNEL_ID"
+Environment="PYTHONPATH=/home/taozhangquant1/TaoTrader"
+ExecStart=/home/taozhangquant1/TaoTrader/venv/bin/python run/daily_alert_scheduler.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
