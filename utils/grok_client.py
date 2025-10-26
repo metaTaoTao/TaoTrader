@@ -51,7 +51,7 @@ class GrokClient:
             "messages": messages,
             "model": model,
             "temperature": 0.7,
-            "max_tokens": 2000,  # 减少token，降低成本和超时风险
+            "max_tokens": 4000,  # 增加到4000，确保完整响应
             "stream": False
         }
         

@@ -106,31 +106,35 @@ def analyze_with_grok_integration(data, auto_call=False, top_n=10):
     print(f"时间戳: {formatted_data['timestamp']}")
     print(f"候选币种 ({len(coin_symbols)}个): {symbols_text}")
     
-    # 要求返回 JSON 格式
-    prompt = f"""请分析以下币种在过去72小时的事件驱动因素，并以 JSON 格式返回：
+    # 要求返回 JSON 格式，明确要求中文
+    prompt = f"""分析以下币种在过去72小时的事件驱动因素，返回JSON格式：
 
 {symbols_text}
 
-要求：
-1. 搜索：Twitter/X、官方公告、GitHub、主流媒体
-2. 分类：listing, delisting, airdrop, unlock, partnership, hack/exploit, tokenomics_change, regulatory, product_release, liquidity_injection, whale_activity, lawsuit, rumor, clarification, other
-3. 评分：热度(0-100)、板块共振(是/否+板块名)、重要性(0-100)、综合事件驱动分数(0-100)
-4. 返回格式必须是有效的 JSON 数组，每个币种一个对象
+要求（中文输出）：
+1. 搜索：Twitter/X、官方公告、GitHub、主流媒体（Coindesk, The Block, Decrypt等）
+2. 事件类型：listing, delisting, airdrop, unlock, partnership, hack/exploit, tokenomics_change, regulatory, product_release, liquidity_injection, whale_activity, lawsuit, rumor, clarification, other
+3. 评分：热度(0-100)、重要性(0-100)、综合事件驱动分数(0-100)
+4. 板块（中文）：AI, 隐私币, 支付币, L2, DeFi, Meme, 预言机, RWA, 游戏, 教育等
+5. 事件摘要必须用中文，简要描述真实事件
+6. 来源链接必须是真实可访问的链接
 
-请返回 JSON 格式（不要用 Markdown 代码块包裹，直接返回纯 JSON）：
+重要：只在找到真实事件时才返回数据，不要编造链接和事件。
+
+返回JSON格式（直接返回纯JSON，不用Markdown代码块）：
 
 ```json
 [
   {{
     "symbol": "ZECUSDT",
     "event_type": "regulatory",
-    "event_summary": "事件摘要",
+    "event_summary": "中文描述：具体事件内容",
     "time_utc": "2024-10-08 14:00",
     "heat_score": 75,
     "sector": "隐私币",
     "importance_score": 85,
     "comprehensive_score": 80,
-    "source_links": ["https://example.com"]
+    "source_links": ["https://真实链接.com"]
   }}
 ]
 ```"""
@@ -175,8 +179,8 @@ def analyze_with_grok_integration(data, auto_call=False, top_n=10):
                         json.dump(json_data, f, indent=2, ensure_ascii=False)
                     print(f"\n💾 JSON 分析结果已保存到: {output_file}")
                     
-                    # 转换为 Discord 友好格式
-                    discord_msg = format_json_for_discord(json_data)
+                    # 转换为 Discord 友好格式（显示全部，不限制数量）
+                    discord_msg = format_json_for_discord(json_data, max_items=10)
                     
                     # 保存 Discord 格式
                     discord_output_file = f"output/grok_analysis_discord_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
