@@ -15,8 +15,12 @@ from datetime import datetime
 from utils.file_helper import DataIO
 from utils.grok_client import get_grok_client
 from data.market_data import BinanceDataFetcher
+from dotenv import load_dotenv
 import pandas as pd
 import numpy as np
+
+# 加载环境变量
+load_dotenv()
 
 
 def load_leaders_data(tf='1h'):
