@@ -29,7 +29,7 @@ class GrokClient:
         if not self.api_key:
             raise ValueError("❌ 未设置 GROK_API_KEY 环境变量")
 
-    def chat(self, messages: list, model: str = "grok-3") -> Dict:
+    def chat(self, messages: list, model: str = "grok-4-fast-reasoning") -> Dict:
         """
         调用 Grok Chat API
 
