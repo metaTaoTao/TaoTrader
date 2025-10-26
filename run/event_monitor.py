@@ -111,11 +111,11 @@ def save_leaders(tf='1h', top_n=20):
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         timeframe = sys.argv[1]
-        top_n = int(sys.argv[2]) if len(sys.argv) > 2 else 20
+        top_n = int(sys.argv[2]) if len(sys.argv) > 2 else 10
     else:
         timeframe = '1h'
-        top_n = 20
-    
+        top_n = 10
+
     try:
         leaders = save_leaders(timeframe, top_n)
         if leaders is not None:
