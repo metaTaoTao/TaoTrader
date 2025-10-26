@@ -14,6 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from datetime import datetime
 from utils.file_helper import DataIO
 from utils.grok_client import get_grok_client
+from utils.format_discord_message import format_simple_discord, format_for_discord, parse_grok_table, format_json_for_discord
 from data.market_data import BinanceDataFetcher
 from dotenv import load_dotenv
 import pandas as pd
@@ -105,16 +106,34 @@ def analyze_with_grok_integration(data, auto_call=False, top_n=10):
     print(f"时间戳: {formatted_data['timestamp']}")
     print(f"候选币种 ({len(coin_symbols)}个): {symbols_text}")
     
-    # 优化后的提示词（更简洁，减少token使用）
-    prompt = f"""请分析以下币种在过去72小时的事件驱动因素：
+    # 要求返回 JSON 格式
+    prompt = f"""请分析以下币种在过去72小时的事件驱动因素，并以 JSON 格式返回：
+
 {symbols_text}
 
 要求：
 1. 搜索：Twitter/X、官方公告、GitHub、主流媒体
 2. 分类：listing, delisting, airdrop, unlock, partnership, hack/exploit, tokenomics_change, regulatory, product_release, liquidity_injection, whale_activity, lawsuit, rumor, clarification, other
-3. 评分：热度(0-100)、板块共振、重要性(0-100)、综合事件驱动分数(0-100)
-4. 输出表格（中文）包含：币种|事件类型|事件摘要|时间(UTC)|热度|板块|重要性|综合分数|来源链接
-5. 按综合事件驱动分数排序"""
+3. 评分：热度(0-100)、板块共振(是/否+板块名)、重要性(0-100)、综合事件驱动分数(0-100)
+4. 返回格式必须是有效的 JSON 数组，每个币种一个对象
+
+请返回 JSON 格式（不要用 Markdown 代码块包裹，直接返回纯 JSON）：
+
+```json
+[
+  {{
+    "symbol": "ZECUSDT",
+    "event_type": "regulatory",
+    "event_summary": "事件摘要",
+    "time_utc": "2024-10-08 14:00",
+    "heat_score": 75,
+    "sector": "隐私币",
+    "importance_score": 85,
+    "comprehensive_score": 80,
+    "source_links": ["https://example.com"]
+  }}
+]
+```"""
     
     if auto_call:
         # 自动调用Grok API
@@ -131,17 +150,52 @@ def analyze_with_grok_integration(data, auto_call=False, top_n=10):
                 analysis_content = response['choices'][0]['message']['content']
                 
                 print("\n" + "="*80)
-                print("🤖 事件驱动分析结果")
+                print("🤖 事件驱动分析结果（原始JSON）")
                 print("="*80)
                 print(analysis_content)
                 
-                # 保存结果到文件
-                output_file = f"output/grok_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-                with open(output_file, 'w', encoding='utf-8') as f:
-                    f.write(analysis_content)
-                print(f"\n💾 分析结果已保存到: {output_file}")
+                # 尝试解析 JSON
+                json_data = None
+                try:
+                    # 尝试提取 JSON（移除可能的 Markdown 代码块）
+                    json_text = analysis_content.strip()
+                    if json_text.startswith('```json'):
+                        json_text = json_text[7:]  # 移除 ```json
+                    if json_text.startswith('```'):
+                        json_text = json_text[3:]  # 移除 ```
+                    if json_text.endswith('```'):
+                        json_text = json_text[:-3]  # 移除结尾的 ```
+                    json_text = json_text.strip()
+                    
+                    json_data = json.loads(json_text)
+                    
+                    # 保存 JSON 格式
+                    output_file = f"output/grok_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                    with open(output_file, 'w', encoding='utf-8') as f:
+                        json.dump(json_data, f, indent=2, ensure_ascii=False)
+                    print(f"\n💾 JSON 分析结果已保存到: {output_file}")
+                    
+                    # 转换为 Discord 友好格式
+                    discord_msg = format_json_for_discord(json_data)
+                    
+                    # 保存 Discord 格式
+                    discord_output_file = f"output/grok_analysis_discord_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+                    with open(discord_output_file, 'w', encoding='utf-8') as f:
+                        f.write(discord_msg)
+                    print(f"💾 Discord 格式已保存到: {discord_output_file}")
+                    
+                    print("\n" + "="*80)
+                    print("📱 Discord 友好格式预览")
+                    print("="*80)
+                    print(discord_msg)
+                    
+                except json.JSONDecodeError as e:
+                    print(f"\n⚠️ 无法解析为 JSON，使用原始文本格式: {e}")
+                    # 回退到原始格式
+                    discord_msg = format_simple_discord(analysis_content)
+                    print(discord_msg)
                 
-                return analysis_content
+                return json_data or analysis_content
             else:
                 print("❌ 未收到有效响应")
                 return None
