@@ -106,38 +106,21 @@ def analyze_with_grok_integration(data, auto_call=False, top_n=10):
     print(f"时间戳: {formatted_data['timestamp']}")
     print(f"候选币种 ({len(coin_symbols)}个): {symbols_text}")
     
-    # 要求返回 JSON 格式，明确要求中文
-    prompt = f"""分析以下币种在过去72小时的事件驱动因素，返回JSON格式：
+    # 优化后的提示词
+    prompt = f"""分析以下币种在过去72小时的事件驱动因素：
 
 {symbols_text}
 
-要求（中文输出）：
-1. 搜索：Twitter/X、官方公告、GitHub、主流媒体（Coindesk, The Block, Decrypt等）
-2. 事件类型：listing, delisting, airdrop, unlock, partnership, hack/exploit, tokenomics_change, regulatory, product_release, liquidity_injection, whale_activity, lawsuit, rumor, clarification, other
-3. 评分：热度(0-100)、重要性(0-100)、综合事件驱动分数(0-100)
-4. 板块（中文）：AI, 隐私币, 支付币, L2, DeFi, Meme, 预言机, RWA, 游戏, 教育等
-5. 事件摘要必须用中文，简要描述真实事件
-6. 来源链接必须是真实可访问的链接
+规则：
+- 事件类型：listing,delisting,airdrop,unlock,partnership,hack,regulatory,product_release,liquidity,whale,lawsuit,rumor,other
+- 板块（中文）：隐私币/AI/DeFi/Meme/L2/预言机/支付币/RWA等
+- 所有文本用中文
+- 来源链接尽量真实
 
-重要：只在找到真实事件时才返回数据，不要编造链接和事件。
+返回JSON数组：
+[{{"symbol":"XXUSDT","event_type":"type","event_summary":"中文事件","time_utc":"2024-10-26 12:00","heat_score":50,"sector":"隐私币","importance_score":60,"comprehensive_score":55,"source_links":["链接"]}}]
 
-返回JSON格式（直接返回纯JSON，不用Markdown代码块）：
-
-```json
-[
-  {{
-    "symbol": "ZECUSDT",
-    "event_type": "regulatory",
-    "event_summary": "中文描述：具体事件内容",
-    "time_utc": "2024-10-08 14:00",
-    "heat_score": 75,
-    "sector": "隐私币",
-    "importance_score": 85,
-    "comprehensive_score": 80,
-    "source_links": ["https://真实链接.com"]
-  }}
-]
-```"""
+必须返回至少一些数据，不要返回空数组[]。"""
     
     if auto_call:
         # 自动调用Grok API

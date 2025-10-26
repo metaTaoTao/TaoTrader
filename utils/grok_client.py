@@ -50,8 +50,8 @@ class GrokClient:
         data = {
             "messages": messages,
             "model": model,
-            "temperature": 0.7,
-            "max_tokens": 4000,  # 增加到4000，确保完整响应
+            "temperature": 0.8,  # 提高温度，增加创造性，但避免完全虚构
+            "max_tokens": 4000,
             "stream": False
         }
         
