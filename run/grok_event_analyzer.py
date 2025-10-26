@@ -38,9 +38,12 @@ def format_data_for_grok(data, top_n=10):
     df = data['data']
     timestamp = data.get('timestamp', 'N/A')
     
+    # 先取前N行，然后迭代
+    df_top = df.head(top_n)
+    
     # 只返回币种列表
     coin_list = []
-    for i, (_, row) in enumerate(df.iterrows()[:top_n], 1):
+    for i, (_, row) in enumerate(df_top.iterrows(), 1):
         coin_list.append({
             'rank': i,
             'symbol': row['symbol'],
