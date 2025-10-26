@@ -38,8 +38,10 @@ def get_24h_leaders(top_n=20):
     results = []
     
     print(f"📊 开始扫描24h涨幅榜...")
+    print(f"📋 总币种数: {len(tickers)}")
     
-    for symbol in tickers[:100]:  # 先扫描前100个，避免API限流
+    # 扫描所有币种，但只记录涨幅最大的币种
+    for symbol in tickers:
         try:
             df = fetcher.get_klines(symbol, interval='1h', total=100)
             
