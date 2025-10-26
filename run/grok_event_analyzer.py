@@ -106,19 +106,21 @@ def analyze_with_grok_integration(data, auto_call=False, top_n=10):
     print(f"时间戳: {formatted_data['timestamp']}")
     print(f"候选币种 ({len(coin_symbols)}个): {symbols_text}")
     
-    # 优化后的提示词
+    # 使用真实工具搜索的提示词
     prompt = f"""分析以下币种在过去72小时的事件驱动因素：
 
 {symbols_text}
 
+使用你的可用工具（如web_search、x_keyword_search、browse_page等）实时搜索过去72小时的真实事件数据（从X/Twitter、CoinMarketCap、CoinDesk、Binance News等来源）。严格禁止虚构任何事件、摘要、时间或链接。如果无真实事件，使用'event_type':'other'并注明'无显著事件'。优先搜索官方公告、X热点讨论、GitHub更新和主流媒体。所有事件必须可验证，并按综合分数（基于热度、板块共振、重要性）从高到低排序JSON数组。
+
 规则：
 - 事件类型：listing,delisting,airdrop,unlock,partnership,hack,regulatory,product_release,liquidity,whale,lawsuit,rumor,other
 - 板块（中文）：隐私币/AI/DeFi/Meme/L2/预言机/支付币/RWA等
-- 所有文本用中文
-- 来源链接尽量真实
+- 所有文本用中文（包括事件摘要）
+- 来源链接必须来自工具搜索结果的真实URL，并在最终响应中使用格式引用。所有事件摘要必须基于工具返回的片段，直接翻译为中文。
 
 返回JSON数组：
-[{{"symbol":"XXUSDT","event_type":"type","event_summary":"中文事件","time_utc":"2024-10-26 12:00","heat_score":50,"sector":"隐私币","importance_score":60,"comprehensive_score":55,"source_links":["链接"]}}]
+[{{"symbol":"XXUSDT","event_type":"type","event_summary":"中文事件","time_utc":"2025-10-26 12:00","heat_score":50,"sector":"隐私币","importance_score":60,"comprehensive_score":55,"source_links":["链接"]}}]
 
 必须返回至少一些数据，不要返回空数组[]。"""
     
